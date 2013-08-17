@@ -17,7 +17,9 @@
 
             <div class="search">
                 <img src="stat/searchBtn.png">
-                <input type="search" placeholder="Событие, место или участник">
+                <label>
+                    <input type="search" placeholder="Событие, место или участник">
+                </label>
             </div>
 
         </div>
@@ -26,10 +28,10 @@
 </div>
 <div class="main">
     <div class="calc">
-        <div id="cal">
             <div class="monthchooser">
-                <button class="arr">&#9664</button> <span class="month">Август</span><span class="year">2013</span> <button class="arr">&#9654</button><button class="today">Сегодня</button>
+                <button id="arr-left">&#9664</button><span class="date"><span id="month">Август</span><span id="year">2013</span></span><button id="arr-right">&#9654</button><button id="today">Сегодня</button>
             </div>
+        <div id="cal">
         </div>
     </div>
 </div>
@@ -37,7 +39,6 @@
 <script type="text/javascript" src="stat/j.js">
 </script>
 
-<!--<input type="date">-->
 
 
 

@@ -38,7 +38,7 @@ td {
     margin: 0 auto;
 }
 
-#cal button.arr {
+.main button#arr-left, .main button#arr-right {
     color: #000000;
 }
 
@@ -57,10 +57,16 @@ td {
 }
 
 .today {
-    margin-left: 5px;
+    background-color: #ebebeb;
 }
 
-.month, .year {
+.date {
+    display: inline-block;
+    width: 150px;
+    text-align: center;
+}
+
+#month, #year {
     font-size: 1.2em;
     padding: 0 3px 0 3px;
     font-weight: bold;

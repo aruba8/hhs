@@ -6,46 +6,61 @@
  * To change this template use File | Settings | File Templates.
  */
 
-var months = ["Январь","Февраль", "Март", "Апрель", "Май", "Июнь", "Июль", "Август", "Сентябрь", "Ноябрь", "Декабрь"];
+var months = ["Январь","Февраль", "Март", "Апрель", "Май", "Июнь", "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"];
 var days = ["Понедельник,", "Вторник,", "Среда,", "Четверг,", "Пятница,", "Суббота,", "Воскресенье,"];
 
 var today = new Date();
 var previousMonth;
-var currentMonth;
 var nextMonth;
+var currentMonth = today.getMonth()+1;
+var currentYear = today.getFullYear();
+
+
+var monthElement = document.getElementById("month");
+var yearElement = document.getElementById("year");
+var todayElement = document.getElementById("today");
 
 function createCalendar(id, year, month) {
     var elem = document.getElementById(id);
 
     var mon = month - 1; // месяцы в JS идут от 0 до 11, а не от 1 до 12
     var d = new Date(year, mon);
+//    console.log(d);
+//    console.log(mon);
     previousMonth = mon-1;
-    currentMonth = mon;
     nextMonth = mon+1;
     var table = '<table><tr>';
-
-    var innerHtml = elem.innerHTML;
-
+    setToCurrentMonth(monthElement, mon);
+    setToCurrentYear(yearElement, currentYear);
 
     var daysInPrevMonth = getNumberOfDaysInMonth(today.getFullYear(), previousMonth+1);
-    var daysInNextMonth = getNumberOfDaysInMonth(today.getFullYear(), nextMonth+1);
-
-    console.log(daysInPrevMonth);
-    console.log(daysInNextMonth);
+//    var daysInNextMonth = getNumberOfDaysInMonth(today.getFullYear(), nextMonth+1);
 
     // заполнить первый ряд от понедельника
     // и до дня, с которого начинается месяц
-    for (var i=0; i<getDay(d); i++) {
+    //noinspection JSDuplicatedDeclaration
+    for (var i=0; i < getDay(d); i++) {
         table += "<td>"+days[i]+" "+(daysInPrevMonth-getDay(d)+i+1)+"</td>";
     }
 
     // ячейки календаря с датами
     var isFirstWeek = true;
     while(d.getMonth() == mon) {
+        var day = d.getDate();
         if(isFirstWeek){
-            table += '<td>'+days[getDay(d)]+' '+d.getDate()+'</td>';
+            if(day == today.getDate() && currentMonth == today.getMonth()+1 && currentYear == today.getFullYear()){
+                table += '<td class="today">'+days[getDay(d)]+' '+day+'</td>';
+            } else{
+                table += '<td>'+days[getDay(d)]+' '+day+'</td>';
+            }
+
         }else{
-            table += '<td>'+d.getDate()+'</td>';
+            if(day == today.getDate() && currentMonth == today.getMonth()+1 && currentYear == today.getFullYear()){
+                table += '<td class="today">'+day+'</td>';
+            }else{
+                table += '<td>'+day+'</td>';
+            }
+
 
         }
         if (getDay(d) % 7 == 6) { // вс, последний день - перевод строки
@@ -58,6 +73,7 @@ function createCalendar(id, year, month) {
 
     // добить таблицу пустыми ячейками, если нужно
     if (getDay(d) != 0) {
+        //noinspection JSDuplicatedDeclaration
         for (var i=getDay(d), j = 1; i<7; i++, j++) {
             table += '<td>'+j+'</td>';
         }
@@ -66,8 +82,19 @@ function createCalendar(id, year, month) {
     // закрыть таблицу
     table += '</tr></table>';
 
+
     // только одно присваивание innerHTML
-    elem.innerHTML = innerHtml+table;
+    elem.innerHTML = table;
+//    setToCurrentMonth(monthElement);
+}
+
+function setToCurrentMonth(elem, month){
+    elem.innerHTML = months[month];
+}
+
+function setToCurrentYear(elem, year){
+    elem.innerHTML = year;
+
 }
 
 function getDay(date) { // получить номер дня недели, от 0(пн) до 6(вс)
@@ -81,4 +108,36 @@ function getNumberOfDaysInMonth(year, month){
 }
 
 createCalendar("cal", today.getFullYear(), today.getMonth()+1);
+
+
+var leftArrow = document.getElementById("arr-left");
+var rightArrow = document.getElementById("arr-right");
+
+
+leftArrow.onclick = function () {
+    currentMonth--;
+//    console.log(currentMonth);
+    if (currentMonth == 0) {
+        currentYear--;
+        currentMonth = 12;
+    }
+    createCalendar("cal", currentYear, currentMonth);
+};
+
+rightArrow.onclick = function () {
+    currentMonth++;
+    console.log(currentMonth);
+    if (currentMonth == 13) {
+        currentYear++;
+        currentMonth = 1;
+    }
+    createCalendar("cal", today.getFullYear(), currentMonth)
+};
+
+todayElement.onclick = function () {
+    currentYear = today.getFullYear();
+    currentMonth = today.getMonth() + 1;
+    createCalendar("cal", currentYear, currentMonth);
+};
+
 
