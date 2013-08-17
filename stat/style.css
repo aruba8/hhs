@@ -1,0 +1,112 @@
+body {
+    margin: 0;
+    font-family: Helvetica, serif;
+}
+
+button {
+    font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
+}
+
+table {
+    margin: 0 auto;
+    border-collapse: collapse;
+}
+
+td {
+    border: 1px solid #ebebeb;
+    width: 100px;
+    height: 100px;
+    vertical-align: top;
+    color: #999999;
+    padding: 5px;
+    font-size: 0.7em;
+}
+
+.header {
+    background-color: #f4f4f4;
+    height: 100px;
+    margin: 0;
+    box-shadow: 3px 3px 3px #999;
+}
+
+.calc, #mng {
+    margin: 0 auto;
+    width: 707px;
+}
+
+.main{
+    margin: 0 auto;
+}
+
+#cal button.arr {
+    color: #000000;
+}
+
+.monthchooser {
+    padding: 20px 0 20px 5px;
+}
+
+.monthchooser button {
+    /*font-size: 1em;*/
+    border-radius: 3px;
+    border-width: 2px;
+    color: darkgray;
+    height: 22px;
+    background-color: white;
+    border-color: #f4f4f4;
+}
+
+.today {
+    margin-left: 5px;
+}
+
+.month, .year {
+    font-size: 1.2em;
+    padding: 0 3px 0 3px;
+    font-weight: bold;
+}
+
+.mngbuttons {
+    position: relative;
+}
+
+
+.mngbuttons button{
+    border-radius: 3px;
+    border-width: 2px;
+    background-color: #006DCC;
+    font-size: 14px;
+    color: #ffffff;
+    vertical-align: middle;
+    line-height: 20px;
+    font-weight: normal;
+    margin-top: 50px;
+}
+
+.search{
+    border-radius: 3px;
+    border-width: 2px;
+    vertical-align: middle;
+    font-weight: normal;
+    position: absolute;
+    right: 3px;
+    top: 50px;
+    padding: 3px;
+
+
+}
+
+img {
+    position: relative;
+    top: 8px;
+}
+
+input[type=search] {
+    width: 195px;
+
+}
+
+
+td:hover {
+    color: black;
+}
