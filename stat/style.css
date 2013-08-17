@@ -98,12 +98,13 @@ td {
 
 img {
     position: relative;
-    top: 8px;
+    bottom: 2px;
 }
 
 input[type=search] {
     width: 195px;
-
+    position: relative;
+    bottom: 10px;
 }
 
 
