@@ -9,11 +9,22 @@
 </head>
 <body>
 
+<div id="upd-event">
+    <img src="stat/cr.png">
+    <button id="delEvent">удалить</button>
+</div>
+
 <div class="header">
     <div id="mng">
         <div class="mngbuttons">
-            <button>Добавить</button>
-            <button>Обновить</button>
+            <button id="addEvent" class="btn">Добавить</button>
+            <div id="addEventForm">
+                <img id="closeEventForm" src="stat/cr.png">
+                <div class="arrow"></div>
+                    <input id="eventText" name="eventtext" type="text" placeholder="14.00 День рождения">
+                    <button id="createEvent"> Создать </button>
+            </div>
+            <button class="btn" id="reload">Обновить</button>
 
             <div class="search">
                 <img src="stat/searchBtn.png">

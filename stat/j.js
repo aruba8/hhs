@@ -20,6 +20,15 @@ var monthElement = document.getElementById("month");
 var yearElement = document.getElementById("year");
 var todayElement = document.getElementById("today");
 var tds = document.getElementsByTagName("td");
+var addEventButton = document.getElementById("addEvent");
+var closeEventForm = document.getElementById("closeEventForm");
+var eventForm = document.getElementById("addEventForm");
+var createEvent = document.getElementById("createEvent");
+var eventSpans = document.getElementsByClassName("eventContainer");
+var updEventDiv = document.getElementById("upd-event");
+var delEventButton = document.getElementById("delEvent");
+var reloadButton = document.getElementById("reload");
+
 var target;
 
 
@@ -28,8 +37,6 @@ function createCalendar(id, year, month) {
 
     var mon = month - 1; // месяцы в JS идут от 0 до 11, а не от 1 до 12
     var d = new Date(year, mon);
-//    console.log(d);
-//    console.log(mon);
     previousMonth = mon-1;
     nextMonth = mon+1;
     var table = '<table><tr>';
@@ -50,18 +57,25 @@ function createCalendar(id, year, month) {
     var isFirstWeek = true;
     while(d.getMonth() == mon) {
         var day = d.getDate();
+        var name = d.getFullYear()+'-'+ d.getMonth()+'-'+d.getDate();
+        var eventText = "";
+        if(getFromStorage(name)){
+            eventText = getFromStorage(name).event;
+//            console.log(day+" "+eventText.event);
+        }
+
         if(isFirstWeek){
             if(day == today.getDate() && currentMonth == today.getMonth()+1 && currentYear == today.getFullYear()){
-                table += '<td class="today">'+days[getDay(d)]+' '+day+'</td>';
+                table += '<td class="today" name='+name+'>'+days[getDay(d)]+' '+day+'<div class="eventContainer"><span>'+eventText+'</span></div></td>';
             } else{
-                table += '<td>'+days[getDay(d)]+' '+day+'</td>';
+                table += '<td name='+name+'>'+days[getDay(d)]+' '+day+'<div class="eventContainer"><span>'+eventText+'</span></div></td>';
             }
 
         }else{
             if(day == today.getDate() && currentMonth == today.getMonth()+1 && currentYear == today.getFullYear()){
-                table += '<td class="today">'+day+'</td>';
+                table += '<td class="today" name='+name+'>'+day+'<div class="eventContainer"><span>'+eventText+'</span></div></td>';
             }else{
-                table += '<td>'+day+'</td>';
+                table += '<td name='+name+'>'+day+'<div class="eventContainer"><span>'+eventText+'</span></div></td>';
             }
 
 
@@ -88,8 +102,8 @@ function createCalendar(id, year, month) {
 
     // только одно присваивание innerHTML
     elem.innerHTML = table;
-    addSelectHandler();
-//    setToCurrentMonth(monthElement);
+    addPickHandler();
+    addEventHandler();
 }
 
 function setToCurrentMonth(elem, month){
@@ -112,6 +126,10 @@ function getNumberOfDaysInMonth(year, month){
 }
 
 createCalendar("cal", today.getFullYear(), today.getMonth()+1);
+
+reloadButton.onclick = function(){
+    createCalendar("cal", currentYear, currentMonth);
+}
 
 
 var leftArrow = document.getElementById("arr-left");
@@ -144,17 +162,17 @@ todayElement.onclick = function () {
     createCalendar("cal", currentYear, currentMonth);
 };
 
-//todayElement.onclick = selectElement;
+//todayElement.onclick = pickElement;
 
 
 
-function addSelectHandler(){
+function addPickHandler(){
     for (var i = 0; i < tds.length; i++){
-        tds[i].onclick = selectElement;
+        tds[i].onclick = pickElement;
     }
 }
 
-function selectElement(event){
+function pickElement(event){
     event = event || window.event;
     if(target)target.style.backgroundColor = "";
     target = event.target;
@@ -162,3 +180,83 @@ function selectElement(event){
 }
 
 
+
+function putToStorage(key, object){
+    localStorage.setItem(key, JSON.stringify(object));
+}
+
+function getFromStorage(key){
+    return JSON.parse(localStorage.getItem(key));
+}
+
+function deleteFromStorage(key){
+    localStorage.removeItem(key);
+}
+
+
+addEventButton.onclick = function(){
+    eventForm.style.display = "block";
+}
+
+function closeEForm(){
+    eventForm.style.display = "none";
+}
+
+closeEventForm.onclick = function(){
+    closeEForm();
+}
+
+createEvent.onclick = function(){
+    var event = document.getElementById("eventText").value;
+    var tdname = target.getAttribute("name");
+    console.log(event);
+    putToStorage(tdname, prepareForStorage(target, event));
+    addEventToTable(target, event);
+    closeEForm();
+}
+
+
+function prepareForStorage(target, text){
+    var blob = {
+        target: target.getAttribute("name"),
+        created: new Date(),
+        event: text
+    }
+    return blob;
+}
+
+function addEventToTable(target, event){
+    var newSpan = document.createElement("SPAN");
+    newSpan.innerHTML = event;
+    target.appendChild(newSpan);
+}
+
+function addEventHandler(){
+    for (var i = 0; i < eventSpans.length; i++){
+        eventSpans[i].onclick = showUpdateForm;
+    }
+}
+
+function closeUpdEventForm(){
+    updEventDiv.style.display = "none";
+}
+
+
+function showUpdateForm(event){
+    event = event || window.event;
+    console.log(event.clientX);
+    console.log(this);
+
+    var key = this.parentElement.getAttribute("name");
+    updEventDiv.style.display = "block";
+    updEventDiv.style.left = event.clientX+"px";
+    updEventDiv.style.top = event.clientY+"px";
+
+    updEventDiv.getElementsByTagName('IMG')[0].onclick = closeUpdEventForm;
+    delEventButton.onclick = function(){
+        deleteFromStorage(key);
+        closeUpdEventForm();
+        createCalendar("cal", currentYear, currentMonth);
+    }
+
+}
