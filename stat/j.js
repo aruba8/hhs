@@ -19,6 +19,9 @@ var currentYear = today.getFullYear();
 var monthElement = document.getElementById("month");
 var yearElement = document.getElementById("year");
 var todayElement = document.getElementById("today");
+var tds = document.getElementsByTagName("td");
+var target;
+
 
 function createCalendar(id, year, month) {
     var elem = document.getElementById(id);
@@ -85,6 +88,7 @@ function createCalendar(id, year, month) {
 
     // только одно присваивание innerHTML
     elem.innerHTML = table;
+    addSelectHandler();
 //    setToCurrentMonth(monthElement);
 }
 
@@ -139,5 +143,22 @@ todayElement.onclick = function () {
     currentMonth = today.getMonth() + 1;
     createCalendar("cal", currentYear, currentMonth);
 };
+
+//todayElement.onclick = selectElement;
+
+
+
+function addSelectHandler(){
+    for (var i = 0; i < tds.length; i++){
+        tds[i].onclick = selectElement;
+    }
+}
+
+function selectElement(event){
+    event = event || window.event;
+    if(target)target.style.backgroundColor = "";
+    target = event.target;
+    target.style.backgroundColor = "#f4f4f4";
+}
 
 
