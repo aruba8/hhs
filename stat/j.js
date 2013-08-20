@@ -59,26 +59,25 @@ function createCalendar(id, year, month) {
         var day = d.getDate();
         var name = d.getFullYear()+'-'+ d.getMonth()+'-'+d.getDate();
         var eventText = "";
+        var eventClass = "";
         if(getFromStorage(name)){
             eventText = getFromStorage(name).event;
-//            console.log(day+" "+eventText.event);
+            eventClass = "event";
         }
 
         if(isFirstWeek){
             if(day == today.getDate() && currentMonth == today.getMonth()+1 && currentYear == today.getFullYear()){
-                table += '<td class="today" name='+name+'>'+days[getDay(d)]+' '+day+'<div class="eventContainer"><span>'+eventText+'</span></div></td>';
+                table += '<td class="today "'+eventClass+' name='+name+'>'+days[getDay(d)]+' '+day+'<div class="eventContainer"><span>'+eventText+'</span></div></td>';
             } else{
-                table += '<td name='+name+'>'+days[getDay(d)]+' '+day+'<div class="eventContainer"><span>'+eventText+'</span></div></td>';
+                table += '<td class="'+eventClass+'" name='+name+'>'+days[getDay(d)]+' '+day+'<div class="eventContainer"><span>'+eventText+'</span></div></td>';
             }
 
         }else{
             if(day == today.getDate() && currentMonth == today.getMonth()+1 && currentYear == today.getFullYear()){
-                table += '<td class="today" name='+name+'>'+day+'<div class="eventContainer"><span>'+eventText+'</span></div></td>';
+                table += '<td class="today '+eventClass+'" name='+name+'>'+day+'<div class="eventContainer"><span>'+eventText+'</span></div></td>';
             }else{
-                table += '<td name='+name+'>'+day+'<div class="eventContainer"><span>'+eventText+'</span></div></td>';
+                table += '<td class="'+eventClass+'" name='+name+'>'+day+'<div class="eventContainer"><span>'+eventText+'</span></div></td>';
             }
-
-
         }
         if (getDay(d) % 7 == 6) { // вс, последний день - перевод строки
             table += '</tr><tr>';
@@ -138,7 +137,6 @@ var rightArrow = document.getElementById("arr-right");
 
 leftArrow.onclick = function () {
     currentMonth--;
-//    console.log(currentMonth);
     if (currentMonth == 0) {
         currentYear--;
         currentMonth = 12;
@@ -167,16 +165,28 @@ todayElement.onclick = function () {
 
 
 function addPickHandler(){
-    for (var i = 0; i < tds.length; i++){
+    for (var i = 0, tdl = tds.length; i < tdl; i++){
         tds[i].onclick = pickElement;
     }
 }
 
 function pickElement(event){
     event = event || window.event;
+    //remove background from previous target
     if(target)target.style.backgroundColor = "";
     target = event.target;
-    target.style.backgroundColor = "#f4f4f4";
+    switch (target.nodeName){
+        case "TD":
+            target.style.backgroundColor = "#f4f4f4";
+            break;
+        case "DIV":
+            target.parentElement.style.backgroundColor = "#f4f4f4";
+            target = target.parentElement;
+            break;
+        case "SPAN":
+            target.parentElement.parentElement.style.backgroundColor = "#f4f4f4";
+            target = target.parentElement.parentElement;
+    }
 }
 
 
@@ -195,6 +205,7 @@ function deleteFromStorage(key){
 
 
 addEventButton.onclick = function(){
+    document.getElementById("eventText").value = "";
     eventForm.style.display = "block";
 }
 
@@ -209,7 +220,6 @@ closeEventForm.onclick = function(){
 createEvent.onclick = function(){
     var event = document.getElementById("eventText").value;
     var tdname = target.getAttribute("name");
-    console.log(event);
     putToStorage(tdname, prepareForStorage(target, event));
     addEventToTable(target, event);
     closeEForm();
@@ -221,7 +231,8 @@ function prepareForStorage(target, text){
     var blob = {
         target: target.getAttribute("name"),
         created: new Date(),
-        event: text
+        event: text,
+        participants: []
     }
     return blob;
 }
@@ -245,8 +256,8 @@ function closeUpdEventForm(){
 
 function showUpdateForm(event){
     event = event || window.event;
-    console.log(event.clientX);
-    console.log(this);
+//    console.log(event.clientX);
+//    console.log(this);
 
     var key = this.parentElement.getAttribute("name");
     updEventDiv.style.display = "block";

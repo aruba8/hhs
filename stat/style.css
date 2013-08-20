@@ -183,6 +183,10 @@ input[type=search] {
     top: 3px;
 }
 
+.event {
+    background-color: #c2e4fe;
+}
+
 
 td:hover {
     color: black;
