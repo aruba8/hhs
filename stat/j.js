@@ -153,7 +153,7 @@ rightArrow.onclick = function () {
         currentYear++;
         currentMonth = 1;
     }
-    createCalendar("cal", today.getFullYear(), currentMonth)
+    createCalendar("cal", currentYear, currentMonth)
 };
 
 todayElement.onclick = function () {
@@ -213,6 +213,7 @@ createEvent.onclick = function(){
     putToStorage(tdname, prepareForStorage(target, event));
     addEventToTable(target, event);
     closeEForm();
+    createCalendar("cal", currentYear, currentMonth);
 }
 
 
