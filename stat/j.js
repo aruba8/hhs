@@ -28,6 +28,7 @@ var eventSpans = document.getElementsByClassName("eventContainer");
 var updEventDiv = document.getElementById("upd-event");
 var delEventButton = document.getElementById("delEvent");
 var reloadButton = document.getElementById("reload");
+var updEventButton = document.getElementById("updEvent");
 
 var target;
 
@@ -227,13 +228,23 @@ createEvent.onclick = function(){
 }
 
 
-function prepareForStorage(target, text){
-    var blob = {
-        target: target.getAttribute("name"),
-        created: new Date(),
-        event: text,
-        participants: []
+function prepareForStorage(target, text, participants, eventTime, place){
+
+    var partisipantsArray =[];
+    if(participants){
+        partisipantsArray = participants.split(",");
     }
+
+    console.log(partisipantsArray);
+
+    var blob = {};
+
+    blob.participants = partisipantsArray;
+    blob.target = target.getAttribute("name");
+    blob.event = text;
+    blob.eventTime = eventTime ? eventTime : "";
+    blob.eventDate = target.getAttribute("name");
+    blob.place = place ? place : "";
     return blob;
 }
 
@@ -256,17 +267,39 @@ function closeUpdEventForm(){
 
 function showUpdateForm(event){
     event = event || window.event;
-//    console.log(event.clientX);
-//    console.log(this);
 
     var key = this.parentElement.getAttribute("name");
+    var currEvent = getFromStorage(key);
+
+
     updEventDiv.style.display = "block";
     updEventDiv.style.left = event.clientX+"px";
     updEventDiv.style.top = event.clientY+"px";
 
     updEventDiv.getElementsByTagName('IMG')[0].onclick = closeUpdEventForm;
+
+    var eventInput = updEventDiv.getElementsByClassName("eventC")[0];
+    var participantsInput = updEventDiv.getElementsByClassName("participantsC")[0];
+    var timeInput = updEventDiv.getElementsByClassName("timeC")[0];
+    var placeInput = updEventDiv.getElementsByClassName("placeC")[0];
+
+    var participantsString = currEvent.participants.join(";");
+
+    eventInput.value = currEvent.event;
+    participantsInput.value = participantsString;
+    timeInput.value = currEvent.eventTime;
+    placeInput.value = currEvent.place;
+
     delEventButton.onclick = function(){
         deleteFromStorage(key);
+        closeUpdEventForm();
+        createCalendar("cal", currentYear, currentMonth);
+    }
+
+    updEventButton.onclick = function(){
+        var tdname = target.getAttribute("name");
+        var toStorage =  prepareForStorage(target, eventInput.value, participantsInput.value, timeInput.value, placeInput.value);
+        putToStorage(tdname, toStorage);
         closeUpdEventForm();
         createCalendar("cal", currentYear, currentMonth);
     }
