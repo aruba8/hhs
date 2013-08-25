@@ -15,7 +15,6 @@ var nextMonth;
 var currentMonth = today.getMonth()+1;
 var currentYear = today.getFullYear();
 
-
 var monthElement = document.getElementById("month");
 var yearElement = document.getElementById("year");
 var todayElement = document.getElementById("today");
@@ -32,7 +31,6 @@ var updEventButton = document.getElementById("updEvent");
 
 var target;
 
-
 function createCalendar(id, year, month) {
     var elem = document.getElementById(id);
 
@@ -45,7 +43,6 @@ function createCalendar(id, year, month) {
     setToCurrentYear(yearElement, currentYear);
 
     var daysInPrevMonth = getNumberOfDaysInMonth(today.getFullYear(), previousMonth+1);
-//    var daysInNextMonth = getNumberOfDaysInMonth(today.getFullYear(), nextMonth+1);
 
     // заполнить первый ряд от понедельника
     // и до дня, с которого начинается месяц
@@ -59,32 +56,36 @@ function createCalendar(id, year, month) {
     while(d.getMonth() == mon) {
         var day = d.getDate();
         var name = d.getFullYear()+'-'+ d.getMonth()+'-'+d.getDate();
-        var eventText = "";
+        var eventTitle = "";
         var eventClass = "";
-        if(getFromStorage(name)){
-            eventText = getFromStorage(name).event;
+        var participants = "";
+        var curEvent = getFromStorage(name);
+        if(curEvent){
+            eventTitle = curEvent.eventTitle;
             eventClass = "event";
+            if(curEvent.participants){
+                participants = curEvent.participants;
+            }
         }
 
         if(isFirstWeek){
             if(day == today.getDate() && currentMonth == today.getMonth()+1 && currentYear == today.getFullYear()){
-                table += '<td class="today "'+eventClass+' name='+name+'>'+days[getDay(d)]+' '+day+'<div class="eventContainer"><span>'+eventText+'</span></div></td>';
+                table += '<td class="today "'+eventClass+' name='+name+'>'+days[getDay(d)]+' '+day+'<div class="eventContainer"><span class="eventTitleSpan">'+eventTitle+'</span></br><span class="tdspanpart">'+participants+'</span></div></td>';
             } else{
-                table += '<td class="'+eventClass+'" name='+name+'>'+days[getDay(d)]+' '+day+'<div class="eventContainer"><span>'+eventText+'</span></div></td>';
+                table += '<td class="'+eventClass+'" name='+name+'>'+days[getDay(d)]+' '+day+'<div class="eventContainer"><span class="eventTitleSpan">'+eventTitle+'</span></br><span class="tdspanpart">'+participants+'</span></div></td>';
             }
 
         }else{
             if(day == today.getDate() && currentMonth == today.getMonth()+1 && currentYear == today.getFullYear()){
-                table += '<td class="today '+eventClass+'" name='+name+'>'+day+'<div class="eventContainer"><span>'+eventText+'</span></div></td>';
+                table += '<td class="today '+eventClass+'" name='+name+'>'+day+'<div class="eventContainer"><span class="eventTitleSpan">'+eventTitle+'</span></br><span class="tdspanpart">'+participants+'</span></div></td>';
             }else{
-                table += '<td class="'+eventClass+'" name='+name+'>'+day+'<div class="eventContainer"><span>'+eventText+'</span></div></td>';
+                table += '<td class="'+eventClass+'" name='+name+'>'+day+'<div class="eventContainer"><span class="eventTitleSpan">'+eventTitle+'</span></br><span class="tdspanpart">'+participants+'</span></div></td>';
             }
         }
         if (getDay(d) % 7 == 6) { // вс, последний день - перевод строки
             table += '</tr><tr>';
             isFirstWeek = false;
         }
-
         d.setDate(d.getDate()+1);
     }
 
@@ -98,7 +99,6 @@ function createCalendar(id, year, month) {
 
     // закрыть таблицу
     table += '</tr></table>';
-
 
     // только одно присваивание innerHTML
     elem.innerHTML = table;
@@ -129,8 +129,7 @@ createCalendar("cal", today.getFullYear(), today.getMonth()+1);
 
 reloadButton.onclick = function(){
     createCalendar("cal", currentYear, currentMonth);
-}
-
+};
 
 var leftArrow = document.getElementById("arr-left");
 var rightArrow = document.getElementById("arr-right");
@@ -147,7 +146,6 @@ leftArrow.onclick = function () {
 
 rightArrow.onclick = function () {
     currentMonth++;
-    console.log(currentMonth);
     if (currentMonth == 13) {
         currentYear++;
         currentMonth = 1;
@@ -160,10 +158,6 @@ todayElement.onclick = function () {
     currentMonth = today.getMonth() + 1;
     createCalendar("cal", currentYear, currentMonth);
 };
-
-//todayElement.onclick = pickElement;
-
-
 
 function addPickHandler(){
     for (var i = 0, tdl = tds.length; i < tdl; i++){
@@ -190,8 +184,6 @@ function pickElement(event){
     }
 }
 
-
-
 function putToStorage(key, object){
     localStorage.setItem(key, JSON.stringify(object));
 }
@@ -208,7 +200,7 @@ function deleteFromStorage(key){
 addEventButton.onclick = function(){
     document.getElementById("eventText").value = "";
     eventForm.style.display = "block";
-}
+};
 
 function closeEForm(){
     eventForm.style.display = "none";
@@ -216,7 +208,7 @@ function closeEForm(){
 
 closeEventForm.onclick = function(){
     closeEForm();
-}
+};
 
 createEvent.onclick = function(){
     var event = document.getElementById("eventText").value;
@@ -225,28 +217,93 @@ createEvent.onclick = function(){
     addEventToTable(target, event);
     closeEForm();
     createCalendar("cal", currentYear, currentMonth);
-}
+};
 
 
-function prepareForStorage(target, text, participants, eventTime, place){
+function prepareForStorage(target, title, participants, eventTime, description){
 
-    var partisipantsArray =[];
-    if(participants){
-        partisipantsArray = participants.split(",");
+    var oldBlob = getFromStorage(target.getAttribute("name"));
+
+    if(oldBlob){
+        addEntityFunctions(oldBlob);
+
+        if(title){
+            oldBlob.setEventTitle(title);
+        }
+        if(participants){
+            oldBlob.setParticipants(participants);
+        }
+        if(eventTime){
+            oldBlob.setEventTime(eventTime);
+        }
+        if(description){
+            oldBlob.setEventDescription(description);
+        }
+        return oldBlob;
+
+    }else{
+        var newBlob = new Entity();
+        addEntityFunctions(newBlob);
+        newBlob.setTarget(target.getAttribute("name"));
+
+        if(title){
+            newBlob.setEventTitle(title);
+        }
+        if(participants){
+            newBlob.setParticipants(participants);
+        }
+        if(eventTime){
+            newBlob.setEventTime(eventTime);
+        }
+        if(description){
+            newBlob.setEventDescription(description);
+        }
+        return newBlob;
     }
-
-    console.log(partisipantsArray);
-
-    var blob = {};
-
-    blob.participants = partisipantsArray;
-    blob.target = target.getAttribute("name");
-    blob.event = text;
-    blob.eventTime = eventTime ? eventTime : "";
-    blob.eventDate = target.getAttribute("name");
-    blob.place = place ? place : "";
-    return blob;
 }
+
+var Entity = function () {
+    this.participants = "";
+    this.eventTitle = "";
+    this.eventDescription = "";
+    this.eventTime = "";
+    this.target = "";
+};
+
+var addEntityFunctions = function(entity){
+    entity.getTarget = function(){
+        return this.target;
+    };
+    entity.setTarget = function(target){
+        this.target = target;
+    };
+    entity.getParticipants = function(){
+        return this.participants;
+    };
+    entity.setParticipants = function(participants){
+        this.participants = participants;
+    };
+    entity.getEventTime = function(){
+        return this.eventTime;
+    };
+    entity.setEventTime = function(eventTime){
+        this.eventTime = eventTime;
+    };
+    entity.getEventTitle = function(){
+        return this.eventTitle;
+    };
+    entity.setEventTitle = function(eventTitle){
+        this.eventTitle = eventTitle;
+    };
+    entity.getEventDescription = function(){
+        return this.eventDescription;
+    };
+    entity.setEventDescription = function(eventDescription){
+        this.eventDescription = eventDescription;
+    };
+};
+
+
 
 function addEventToTable(target, event){
     var newSpan = document.createElement("SPAN");
@@ -264,44 +321,94 @@ function closeUpdEventForm(){
     updEventDiv.style.display = "none";
 }
 
-
 function showUpdateForm(event){
     event = event || window.event;
 
     var key = this.parentElement.getAttribute("name");
     var currEvent = getFromStorage(key);
-
+    var eventTitle = updEventDiv.getElementsByClassName("eventCH")[0];
+    var eventTitleInput = updEventDiv.getElementsByClassName("eventC")[0];
+    var participantsInput = updEventDiv.getElementsByClassName("participantsC")[0];
+    var participantsSpan = updEventDiv.getElementsByClassName("partCspan")[0];
+    var timeInput = updEventDiv.getElementsByClassName("timeC")[0];
+    var timeSpan = updEventDiv.getElementsByClassName("timeCspan")[0];
+    var description = updEventDiv.getElementsByClassName("description")[0];
+    var participantsDiv = updEventDiv.getElementsByClassName("partisipants")[0];
 
     updEventDiv.style.display = "block";
-    updEventDiv.style.left = event.clientX+"px";
-    updEventDiv.style.top = event.clientY+"px";
-
+    updEventDiv.style.left = (event.clientX+50)+"px";
+    updEventDiv.style.top = (event.clientY-22)+"px";
     updEventDiv.getElementsByTagName('IMG')[0].onclick = closeUpdEventForm;
 
-    var eventInput = updEventDiv.getElementsByClassName("eventC")[0];
-    var participantsInput = updEventDiv.getElementsByClassName("participantsC")[0];
-    var timeInput = updEventDiv.getElementsByClassName("timeC")[0];
-    var placeInput = updEventDiv.getElementsByClassName("placeC")[0];
+    if(currEvent){
 
-    var participantsString = currEvent.participants.join(";");
+        if(currEvent.eventTitle){
+            eventTitleInput.style.display = "none";
+            eventTitle.style.display = "block";
+            eventTitle.innerHTML = currEvent.eventTitle;
+        }else{
+            eventTitle.innerHTML = "";
+            eventTitle.style.display = "none";
+            eventTitleInput.style.display = "block";
+        }
 
-    eventInput.value = currEvent.event;
-    participantsInput.value = participantsString;
-    timeInput.value = currEvent.eventTime;
-    placeInput.value = currEvent.place;
+        if(!currEvent.participants){
+            participantsInput.value = "";
+            participantsInput.innerHTML = "";
+            participantsDiv.style.display = "none";
+            participantsInput.style.display = "block";
+
+        }else {
+            participantsInput.style.display = "none";
+            participantsDiv.style.display = "block";
+            participantsSpan.style.display = "block";
+            participantsSpan.innerHTML = currEvent.participants;
+        }
+
+        if(currEvent.eventTime == ""){
+            timeInput.value = "";
+            timeInput.style.display = "block";
+            timeSpan.innerHTML = "";
+        }else{
+            timeInput.style.display = "none";
+            timeSpan.style.display = "block";
+            timeSpan.innerHTML = currEvent.eventTime;
+        }
+
+        description.value = currEvent.eventDescription;
+    } else{
+        eventTitle.style.display = "none";
+        eventTitle.innerHTML = "";
+        eventTitleInput.style.display = "block";
+        eventTitleInput.value = "";
+
+        timeInput.value = "";
+        timeSpan.innerHTML = "";
+        timeSpan.style.display = "none";
+        timeInput.style.display = "block";
+
+        description.innerHTML = "";
+        description.value = "";
+
+        participantsDiv.style.display = "none";
+        participantsSpan.innerHTML = "";
+        participantsInput.value = "";
+        participantsInput.style.display = "block";
+        participantsSpan.style.display = "none";
+
+    }
 
     delEventButton.onclick = function(){
         deleteFromStorage(key);
         closeUpdEventForm();
         createCalendar("cal", currentYear, currentMonth);
-    }
+    };
 
     updEventButton.onclick = function(){
         var tdname = target.getAttribute("name");
-        var toStorage =  prepareForStorage(target, eventInput.value, participantsInput.value, timeInput.value, placeInput.value);
+        var toStorage =  prepareForStorage(target, eventTitleInput.value, participantsInput.value, timeInput.value, description.value);
         putToStorage(tdname, toStorage);
         closeUpdEventForm();
         createCalendar("cal", currentYear, currentMonth);
-    }
-
+    };
 }
