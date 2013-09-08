@@ -128,6 +128,8 @@ function getNumberOfDaysInMonth(year, month){
 createCalendar("cal", today.getFullYear(), today.getMonth()+1);
 
 reloadButton.onclick = function(){
+    target = undefined;
+    eventForm.style.display = 'none';
     createCalendar("cal", currentYear, currentMonth);
 };
 
@@ -166,6 +168,8 @@ function addPickHandler(){
 }
 
 function pickElement(event){
+    var label = eventForm.getElementsByTagName("LABEL")[0];
+
     event = event || window.event;
     //remove background from previous target
     if(target)target.style.backgroundColor = "";
@@ -182,6 +186,11 @@ function pickElement(event){
             target.parentElement.parentElement.style.backgroundColor = "#f4f4f4";
             target = target.parentElement.parentElement;
     }
+    var dateForLabel = new Date(Date.parse(target.getAttribute("name")));
+
+    console.log(dateForLabel);
+
+    setDateToLabel(label, dateForLabel);
 }
 
 function putToStorage(key, object){
@@ -197,10 +206,18 @@ function deleteFromStorage(key){
 }
 
 
-addEventButton.onclick = function(){
+addEventButton.onclick = showAddEventForm;
+
+function showAddEventForm(event){
+    var label = eventForm.getElementsByTagName("LABEL")[0];
+    if(target == undefined){
+        label.style.display = "block";
+        label.innerHTML = "Выберите день для события";
+        label.setAttribute("class", "");
+    }
     document.getElementById("eventText").value = "";
     eventForm.style.display = "block";
-};
+}
 
 function closeEForm(){
     eventForm.style.display = "none";
@@ -314,8 +331,20 @@ function addEventToTable(target, event){
 function addEventHandler(){
     for (var i = 0; i < eventSpans.length; i++){
         eventSpans[i].onclick = showUpdateForm;
+        eventSpans[i].onmouseover = onHoverPop;
     }
 }
+
+var eee;
+function onHoverPop(event){
+    event = event || window.event;
+//    event.fromElement.style.backgroundColor = "#ffffff";
+    console.log(event.clientX+" : "+event.clientY);
+//    event.srcElement.style.backgroundColor = "#c2e4fe";
+    eee=event;
+}
+
+
 
 function closeUpdEventForm(){
     updEventDiv.style.display = "none";
@@ -334,6 +363,7 @@ function showUpdateForm(event){
     var timeSpan = updEventDiv.getElementsByClassName("timeCspan")[0];
     var description = updEventDiv.getElementsByClassName("description")[0];
     var participantsDiv = updEventDiv.getElementsByClassName("partisipants")[0];
+
 
     updEventDiv.style.display = "block";
     updEventDiv.style.left = (event.clientX+50)+"px";
@@ -411,4 +441,10 @@ function showUpdateForm(event){
         closeUpdEventForm();
         createCalendar("cal", currentYear, currentMonth);
     };
+}
+
+function setDateToLabel(labelElem, date){
+    var dateForLabel = date.getDate()+"."+(date.getMonth()+1)+"."+date.getFullYear();
+    labelElem.setAttribute("class", "picked");
+    labelElem.innerText = dateForLabel;
 }

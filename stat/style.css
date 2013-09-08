@@ -29,6 +29,10 @@ td .eventContainer {
     overflow: hidden;
 }
 
+.eventContainer:hover {
+    background-color: #c2e4fe;
+}
+
 .header {
     background-color: #f4f4f4;
     height: 100px;
@@ -131,7 +135,7 @@ input[type=search] {
 
     font-size: 12px;
     color: #3a3a3a;
-    text-align: justify;
+    /*text-align: justify;*/
     box-shadow: 0 0 5px #999;
 }
 
@@ -147,9 +151,19 @@ input[type=search] {
     top: -20px;
 }
 
-#addEventForm input[type=text]{
+#addEventForm input[type=text], #addEventForm label{
     width: 250px;
     margin: 5px;
+}
+
+#addEventForm .picked{
+    color: #000000;
+    background-color: #ffffff;
+}
+
+#addEventForm label{
+    color: red;
+    background-color: yellow;
 }
 
 #addEventForm button{
