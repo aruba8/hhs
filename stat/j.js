@@ -186,7 +186,9 @@ function pickElement(event){
             target.parentElement.parentElement.style.backgroundColor = "#f4f4f4";
             target = target.parentElement.parentElement;
     }
-    var dateForLabel = new Date(Date.parse(target.getAttribute("name")));
+
+    var preparedDate = Date.parse(prepareDateToParse(target.getAttribute("name")));
+    var dateForLabel = new Date(preparedDate);
 
     console.log(dateForLabel);
 
@@ -447,4 +449,10 @@ function setDateToLabel(labelElem, date){
     var dateForLabel = date.getDate()+"."+(date.getMonth()+1)+"."+date.getFullYear();
     labelElem.setAttribute("class", "picked");
     labelElem.innerText = dateForLabel;
+}
+
+function prepareDateToParse(date){
+    var splittedDate = date.split('-');
+    splittedDate[1] = parseInt(splittedDate[1])+1;
+    return splittedDate[0]+'-'+splittedDate[1]+'-'+splittedDate[2];
 }
